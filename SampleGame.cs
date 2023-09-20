@@ -104,6 +104,7 @@ public class SampleGame : Game
         TransformSystem.Update(gameTime);
         InputManager.Update(gameTime);
         _player.Update(gameTime);
+        camera.Update(gameTime);
 
         KeyboardState keyboardCur = Keyboard.GetState();
 
@@ -183,10 +184,18 @@ public class SampleGame : Game
             transform.scale = numScale.TranslateVector2();
             if (transform.entity.ContainsComponent<PlayerController>())
             {
+                if(ImGui.Button("Attach Camera to this Entity"))
+                    camera.AttachToEntity(_player.entity);
+
+                if (ImGui.Button("Detach Camera from Entity"))
+                    camera.AttachToEntity(null);
+
                 ImGui.DragFloat("Player Speed", ref _player.speed);
+                ImGui.DragFloat("Acceleration Scale", ref _player.accelerationScale);
+                ImGui.LabelText("Current Acceleration:",  _player.currentAccel.ToString());
             }
         }
-
+        
         ImGui.End();
     }
     public static Texture2D CreateTexture(GraphicsDevice device, int width, int height, Func<int, Color> paint)

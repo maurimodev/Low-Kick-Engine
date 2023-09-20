@@ -5,6 +5,8 @@ public class Camera2D : Component
 {
     public float zoom;
     public Matrix matrixTransform;
+    public bool isAttached;
+    private Entity attachedEntity;
     public Camera2D()
     {
         zoom = 3;
@@ -23,6 +25,25 @@ public class Camera2D : Component
     public void Move(Vector2 dir)
     {
         entity.transform.position += dir;
+    }
+
+    public void AttachToEntity(Entity entity)
+    {
+        if (entity == null)
+        {
+            isAttached = false;
+            attachedEntity = null;
+            return;
+        }
+        isAttached = true;
+        attachedEntity = entity;
+    }
+    public override void Update(GameTime gameTime)
+    {
+        if (isAttached)
+        {
+            entity.transform.position = attachedEntity.transform.position;
+        }
     }
 
     public Matrix GetTransformation(GraphicsDevice device)

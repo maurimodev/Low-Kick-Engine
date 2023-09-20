@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Xna.Framework;
 
 public class PlayerController : Component
@@ -7,6 +8,16 @@ public class PlayerController : Component
     public Collider collider;
     private float xRemainder = 0;
     public float speed = 50;
+    public float maxAccel = 3;
+    public float currentAccel = 0;
+    public float accelerationScale = 15;
+    public float deccelerationScale = 20;
+
+    private Vector2 lastAxis;
+    
+    public float slideSpeed = 5;
+    public float bounceOffSpeed = 40;
+    public bool isBouncingOff = false;
     public PlayerController()
     {
     }
@@ -22,11 +33,31 @@ public class PlayerController : Component
 
         if (horizontalAxis.X != 0)
         {
-            MoveX(horizontalAxis.X * speed * (float)gameTime.ElapsedGameTime.TotalSeconds, null);
+            lastAxis = horizontalAxis;
+            if (currentAccel < maxAccel)
+            {
+                currentAccel += (float)gameTime.ElapsedGameTime.TotalSeconds * accelerationScale;
+            }
+            else
+            {
+                currentAccel = maxAccel;
+            }
+            MoveX(horizontalAxis.X * speed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, gameTime, null);
+        }
+        else
+        {
+            if (currentAccel > 0)
+            {
+                currentAccel -= (float)gameTime.ElapsedGameTime.TotalSeconds * deccelerationScale;
+            }
+            else
+            {
+                currentAccel = 0;
+            }
+            MoveX(lastAxis.X * slideSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, gameTime, null);
         }
     }
-
-    public void MoveX(float amt, Action onCollide)
+    public void MoveX(float amt, GameTime gameTime, Action<int, GameTime> onCollide)
     {
         xRemainder += amt;
         var move = (int)Math.Round(xRemainder);
@@ -45,7 +76,7 @@ public class PlayerController : Component
                 {
                     Console.WriteLine("Would collide!");
                     if (onCollide != null)
-                        onCollide();
+                        onCollide(sign, gameTime);
                     break;
                 }
             }
