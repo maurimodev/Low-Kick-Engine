@@ -57,17 +57,17 @@ public static class InputManager
 
         // AIM
 
-        Bind(ControlScheme.UP_R, new Keybind(Keys.Up, Buttons.RightThumbstickUp));
-        Bind(ControlScheme.DOWN_R, new Keybind(Keys.Down, Buttons.RightThumbstickDown));
-        Bind(ControlScheme.LEFT_R, new Keybind(Keys.Left, Buttons.RightThumbstickLeft));
-        Bind(ControlScheme.RIGHT_R, new Keybind(Keys.Right, Buttons.RightThumbstickRight));
+        Bind(ControlScheme.UP_L, new Keybind(Keys.Up, Buttons.RightThumbstickUp));
+        Bind(ControlScheme.DOWN_L, new Keybind(Keys.Down, Buttons.RightThumbstickDown));
+        Bind(ControlScheme.LEFT_L, new Keybind(Keys.Left, Buttons.RightThumbstickLeft));
+        Bind(ControlScheme.RIGHT_L, new Keybind(Keys.Right, Buttons.RightThumbstickRight));
 
         // ACTIONS
 
-        Bind(ControlScheme.A, new Keybind(Keys.Z, Buttons.A));
-        Bind(ControlScheme.B, new Keybind(Keys.X, Buttons.B));
+        Bind(ControlScheme.A, new Keybind(Keys.J, Buttons.A));
+        Bind(ControlScheme.B, new Keybind(Keys.K, Buttons.B));
         Bind(ControlScheme.LEFT_TRIGGER, new Keybind(Keys.Q, Buttons.LeftTrigger));
-        Bind(ControlScheme.RIGHT_TRIGGER, new Keybind(Keys.Space, Buttons.RightTrigger));
+        Bind(ControlScheme.RIGHT_TRIGGER, new Keybind(Keys.R, Buttons.RightTrigger));
 
         // MISC
 

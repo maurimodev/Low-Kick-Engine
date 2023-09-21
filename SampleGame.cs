@@ -7,6 +7,7 @@ using Num = System.Numerics;
 using ImGuiNET;
 using KungFuPlatform;
 using Microsoft.Xna.Framework.Input;
+using Coroutine;
 
 public class SampleGame : Game
 {
@@ -73,7 +74,13 @@ public class SampleGame : Game
         var knight = new Entity("Knight");
         knight.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
         knight.AddComponent<Collider>(new Collider(knight.transform));
-        knight.transform.position = new Vector2(90, 0);
+        knight.transform.position = new Vector2(40, 100);
+
+        var knight1 = new Entity("Knight");
+        knight1.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
+        knight1.AddComponent<Collider>(new Collider(knight1.transform));
+        knight1.transform.position = new Vector2(100, 100);
+
 
         // Create camera
         var cameraObject = new Entity("Camera");
@@ -100,6 +107,8 @@ public class SampleGame : Game
     protected override void Update(GameTime gameTime)
     {
         // Update Systems
+        Time.Update(gameTime);
+        CoroutineHandler.Tick(gameTime.ElapsedGameTime.TotalSeconds);
         PhysicsSystem.Update(gameTime);
         TransformSystem.Update(gameTime);
         InputManager.Update(gameTime);
@@ -193,6 +202,8 @@ public class SampleGame : Game
                 ImGui.DragFloat("Player Speed", ref _player.speed);
                 ImGui.DragFloat("Acceleration Scale", ref _player.accelerationScale);
                 ImGui.LabelText("Current Acceleration:",  _player.currentAccel.ToString());
+                ImGui.DragFloat("Jump Height", ref _player.jumpHeight);
+                ImGui.DragFloat("Jump Time until Apex", ref _player.timeUntilApex);
             }
         }
         

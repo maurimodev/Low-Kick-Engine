@@ -1,11 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections;
+using Coroutine;
+using System.Collections.Generic;
+using System;
 
 public class Camera2D : Component
 {
     public float zoom;
     public Matrix matrixTransform;
     public bool isAttached;
+    public bool isLerping = false;
     private Entity attachedEntity;
     public Camera2D()
     {
@@ -35,17 +40,33 @@ public class Camera2D : Component
             attachedEntity = null;
             return;
         }
+        CoroutineHandler.Start(LerpBetweenPositions(this.entity.transform, entity.transform, 4));
         isAttached = true;
         attachedEntity = entity;
     }
     public override void Update(GameTime gameTime)
     {
-        if (isAttached)
+        if (isAttached && !isLerping)
         {
             entity.transform.position = attachedEntity.transform.position;
         }
     }
 
+    public IEnumerator<Wait> LerpBetweenPositions(Transform current, Transform goal, float speed)
+    {
+        isLerping = true;
+        float t = 0;
+        while(t < 1)
+        {
+            System.Numerics.Vector2 lerpPos = System.Numerics.Vector2.Lerp(current.position.TranslateVector2(), goal.position.TranslateVector2(), t);
+            entity.transform.position = lerpPos.TranslateVector2();
+            t += speed * Time.deltaTime;
+            yield return new Wait(Time.deltaTime);
+        }
+        isLerping = false;
+        Console.WriteLine("Finished routine!");
+
+    }
     public Matrix GetTransformation(GraphicsDevice device)
     {
         matrixTransform = Matrix.CreateTranslation(new Vector3(-entity.transform.position.X, -entity.transform.position.Y, 0)) *

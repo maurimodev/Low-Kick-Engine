@@ -102,9 +102,13 @@
     <Compile Include="Scripts\InputManager.cs" />
     <Compile Include="Scripts\Physics2D.cs" />
     <Compile Include="Scripts\ECS\Systems\TransformSystem.cs" />
+    <Compile Include="Scripts\Time.cs" />
     <Compile Include="Scripts\Utilities\Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Coroutine, Version=2.1.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Coroutine.2.1.5\lib\net45\Coroutine.dll</HintPath>
+    </Reference>
     <Reference Include="FNA">
       <HintPath>..\..\FNA\bin\Debug\FNA.dll</HintPath>
     </Reference>
@@ -115,6 +119,9 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

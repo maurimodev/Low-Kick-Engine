@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Coroutine</name>
+    </assembly>
+    <members>
+        <member name="T:Coroutine.ActiveCoroutine">
+            <summary>
+            A reference to a currently running coroutine.
+            This is returned by <see cref="M:Coroutine.CoroutineHandler.Start(System.Collections.Generic.IEnumerator{Coroutine.Wait},System.String,System.Int32)"/>.
+            </summary>
+        </member>
+        <member name="P:Coroutine.ActiveCoroutine.IsFinished">
+            <summary>
+            This property stores whether or not this active coroutine is finished.
+            A coroutine is finished if all of its waits have passed, or if it <see cref="P:Coroutine.ActiveCoroutine.WasCanceled"/>.
+            </summary>
+        </member>
+        <member name="P:Coroutine.ActiveCoroutine.WasCanceled">
+            <summary>
+            This property stores whether or not this active coroutine was cancelled using <see cref="M:Coroutine.ActiveCoroutine.Cancel"/>.
+            </summary>
+        </member>
+        <member name="P:Coroutine.ActiveCoroutine.TotalMoveNextTime">
+            <summary>
+            The total amount of time that <see cref="M:Coroutine.ActiveCoroutine.MoveNext"/> took.
+            This is the amount of time that this active coroutine took for the entirety of its "steps", or yield statements.
+            </summary>
+        </member>
+        <member name="P:Coroutine.ActiveCoroutine.MoveNextCount">
+            <summary>
+            The total amount of times that <see cref="M:Coroutine.ActiveCoroutine.MoveNext"/> was invoked.
+            This is the amount of "steps" in your coroutine, or the amount of yield statements.
+            </summary>
+        </member>
+        <member name="P:Coroutine.ActiveCoroutine.LastMoveNextTime">
+            <summary>
+            The amount of time that the last <see cref="M:Coroutine.ActiveCoroutine.MoveNext"/> took.
+            This is the amount of time that this active coroutine took for the last "step", or yield statement.
+            </summary>
+        </member>
+        <member name="E:Coroutine.ActiveCoroutine.OnFinished">
+            <summary>
+            An event that gets fired when this active coroutine finishes or gets cancelled.
+            When this event is called, <see cref="P:Coroutine.ActiveCoroutine.IsFinished"/> is always true.
+            </summary>
+        </member>
+        <member name="F:Coroutine.ActiveCoroutine.Name">
+            <summary>
+            The name of this coroutine.
+            When not specified on startup of this coroutine, the name defaults to an empty string.
+            </summary>
+        </member>
+        <member name="F:Coroutine.ActiveCoroutine.Priority">
+            <summary>
+            The priority of this coroutine. The higher the priority, the earlier it is advanced compared to other coroutines that advance around the same time.
+            When not specified at startup of this coroutine, the priority defaults to 0.
+            </summary>
+        </member>
+        <member name="M:Coroutine.ActiveCoroutine.Cancel">
+            <summary>
+            Cancels this coroutine, causing all subsequent <see cref="T:Coroutine.Wait"/>s and any code in between to be skipped.
+            </summary>
+            <returns>Whether the cancellation was successful, or this coroutine was already cancelled or finished</returns>
+        </member>
+        <member name="T:Coroutine.ActiveCoroutine.FinishCallback">
+            <summary>
+            A delegate method used by <see cref="E:Coroutine.ActiveCoroutine.OnFinished"/>.
+            </summary>
+            <param name="coroutine">The coroutine that finished</param>
+        </member>
+        <member name="M:Coroutine.ActiveCoroutine.CompareTo(Coroutine.ActiveCoroutine)">
+            <inheritdoc />
+        </member>
+        <member name="T:Coroutine.CoroutineHandler">
+            <summary>
+            This class can be used for static coroutine handling of any kind.
+            Note that it uses an underlying <see cref="T:Coroutine.CoroutineHandlerInstance"/> object for management.
+            </summary>
+        </member>
+        <member name="P:Coroutine.CoroutineHandler.TickingCount">
+            <inheritdoc cref="P:Coroutine.CoroutineHandlerInstance.TickingCount"/>
+        </member>
+        <member name="P:Coroutine.CoroutineHandler.EventCount">
+            <inheritdoc cref="P:Coroutine.CoroutineHandlerInstance.EventCount"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.Start(System.Collections.Generic.IEnumerable{Coroutine.Wait},System.String,System.Int32)">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.Start(System.Collections.Generic.IEnumerable{Coroutine.Wait},System.String,System.Int32)"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.Start(System.Collections.Generic.IEnumerator{Coroutine.Wait},System.String,System.Int32)">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.Start(System.Collections.Generic.IEnumerator{Coroutine.Wait},System.String,System.Int32)"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.InvokeLater(Coroutine.Wait,System.Action,System.String,System.Int32)">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.InvokeLater(Coroutine.Wait,System.Action,System.String,System.Int32)"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.InvokeLater(Coroutine.Event,System.Action,System.String,System.Int32)">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.InvokeLater(Coroutine.Event,System.Action,System.String,System.Int32)"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.Tick(System.Double)">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.Tick(System.Double)"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.Tick(System.TimeSpan)">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.Tick(System.TimeSpan)"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.RaiseEvent(Coroutine.Event)">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.RaiseEvent(Coroutine.Event)"/>
+        </member>
+        <member name="M:Coroutine.CoroutineHandler.GetActiveCoroutines">
+            <inheritdoc cref="M:Coroutine.CoroutineHandlerInstance.GetActiveCoroutines"/>
+        </member>
+        <member name="T:Coroutine.CoroutineHandlerInstance">
+            <summary>
+            An object of this class can be used to start, tick and otherwise manage active <see cref="T:Coroutine.ActiveCoroutine"/>s as well as their <see cref="T:Coroutine.Event"/>s.
+            Note that a static implementation of this can be found in <see cref="T:Coroutine.CoroutineHandler"/>.
+            </summary>
+        </member>
+        <member name="P:Coroutine.CoroutineHandlerInstance.TickingCount">
+            <summary>
+            The amount of <see cref="T:Coroutine.ActiveCoroutine"/> instances that are currently waiting for a tick (waiting for time to pass)
+            </summary>
+        </member>
+        <member name="P:Coroutine.CoroutineHandlerInstance.EventCount">
+            <summary>
+            The amount of <see cref="T:Coroutine.ActiveCoroutine"/> instances that are currently waiting for an <see cref="T:Coroutine.Event"/>
+            </summary>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.Start(System.Collections.Generic.IEnumerable{Coroutine.Wait},System.String,System.Int32)">
+            <summary>
+            Starts the given coroutine, returning a <see cref="T:Coroutine.ActiveCoroutine"/> object for management.
+            Note that this calls <see cref="M:System.Collections.Generic.IEnumerable`1.GetEnumerator"/> to get the enumerator.
+            </summary>
+            <param name="coroutine">The coroutine to start</param>
+            <param name="name">The <see cref="F:Coroutine.ActiveCoroutine.Name"/> that this coroutine should have. Defaults to an empty string.</param>
+            <param name="priority">The <see cref="F:Coroutine.ActiveCoroutine.Priority"/> that this coroutine should have. The higher the priority, the earlier it is advanced. Defaults to 0.</param>
+            <returns>An active coroutine object representing this coroutine</returns>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.Start(System.Collections.Generic.IEnumerator{Coroutine.Wait},System.String,System.Int32)">
+            <summary>
+            Starts the given coroutine, returning a <see cref="T:Coroutine.ActiveCoroutine"/> object for management.
+            </summary>
+            <param name="coroutine">The coroutine to start</param>
+            <param name="name">The <see cref="F:Coroutine.ActiveCoroutine.Name"/> that this coroutine should have. Defaults to an empty string.</param>
+            <param name="priority">The <see cref="F:Coroutine.ActiveCoroutine.Priority"/> that this coroutine should have. The higher the priority, the earlier it is advanced compared to other coroutines that advance around the same time. Defaults to 0.</param>
+            <returns>An active coroutine object representing this coroutine</returns>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.InvokeLater(Coroutine.Wait,System.Action,System.String,System.Int32)">
+            <summary>
+            Causes the given action to be invoked after the given <see cref="T:Coroutine.Wait"/>.
+            This is equivalent to a coroutine that waits for the given wait and then executes the given <see cref="T:System.Action"/>.
+            </summary>
+            <param name="wait">The wait to wait for</param>
+            <param name="action">The action to execute after waiting</param>
+            <param name="name">The <see cref="F:Coroutine.ActiveCoroutine.Name"/> that the underlying coroutine should have. Defaults to an empty string.</param>
+            <param name="priority">The <see cref="F:Coroutine.ActiveCoroutine.Priority"/> that the underlying coroutine should have. The higher the priority, the earlier it is advanced compared to other coroutines that advance around the same time. Defaults to 0.</param>
+            <returns>An active coroutine object representing this coroutine</returns>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.InvokeLater(Coroutine.Event,System.Action,System.String,System.Int32)">
+            <summary>
+            Causes the given action to be invoked after the given <see cref="T:Coroutine.Event"/>.
+            This is equivalent to a coroutine that waits for the given wait and then executes the given <see cref="T:System.Action"/>.
+            </summary>
+            <param name="evt">The event to wait for</param>
+            <param name="action">The action to execute after waiting</param>
+            <param name="name">The <see cref="F:Coroutine.ActiveCoroutine.Name"/> that the underlying coroutine should have. Defaults to an empty string.</param>
+            <param name="priority">The <see cref="F:Coroutine.ActiveCoroutine.Priority"/> that the underlying coroutine should have. The higher the priority, the earlier it is advanced compared to other coroutines that advance around the same time. Defaults to 0.</param>
+            <returns>An active coroutine object representing this coroutine</returns>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.Tick(System.Double)">
+            <summary>
+            Ticks this coroutine handler, causing all time-based <see cref="T:Coroutine.Wait"/>s to be ticked.
+            </summary>
+            <param name="deltaSeconds">The amount of seconds that have passed since the last time this method was invoked</param>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.Tick(System.TimeSpan)">
+            <summary>
+            Ticks this coroutine handler, causing all time-based <see cref="T:Coroutine.Wait"/>s to be ticked.
+            This is a convenience method that calls <see cref="M:Coroutine.CoroutineHandlerInstance.Tick(System.Double)"/>, but accepts a <see cref="T:System.TimeSpan"/> instead of an amount of seconds.
+            </summary>
+            <param name="delta">The time that has passed since the last time this method was invoked</param>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.RaiseEvent(Coroutine.Event)">
+            <summary>
+            Raises the given event, causing all event-based <see cref="T:Coroutine.Wait"/>s to be updated.
+            </summary>
+            <param name="evt">The event to raise</param>
+        </member>
+        <member name="M:Coroutine.CoroutineHandlerInstance.GetActiveCoroutines">
+            <summary>
+            Returns a list of all currently active <see cref="T:Coroutine.ActiveCoroutine"/> objects under this handler.
+            </summary>
+            <returns>All active coroutines</returns>
+        </member>
+        <member name="T:Coroutine.Event">
+            <summary>
+            An event is any kind of action that a <see cref="T:Coroutine.Wait"/> can listen for.
+            Note that, by default, events don't have a custom <see cref="M:System.Object.Equals(System.Object)"/> implementation. 
+            </summary>
+        </member>
+        <member name="T:Coroutine.Wait">
+            <summary>
+            Represents either an amount of time, or an <see cref="T:Coroutine.Event"/> that is being waited for by an <see cref="T:Coroutine.ActiveCoroutine"/>.
+            </summary>
+        </member>
+        <member name="M:Coroutine.Wait.#ctor(Coroutine.Event)">
+            <summary>
+            Creates a new wait that waits for the given <see cref="T:Coroutine.Event"/>.
+            </summary>
+            <param name="evt">The event to wait for</param>
+        </member>
+        <member name="M:Coroutine.Wait.#ctor(System.Double)">
+            <summary>
+            Creates a new wait that waits for the given amount of seconds.
+            </summary>
+            <param name="seconds">The amount of seconds to wait for</param>
+        </member>
+        <member name="M:Coroutine.Wait.#ctor(System.TimeSpan)">
+            <summary>
+            Creates a new wait that waits for the given <see cref="T:System.TimeSpan"/>.
+            Note that the exact value may be slightly different, since waits operate in <see cref="P:System.TimeSpan.TotalSeconds"/> rather than ticks.
+            </summary>
+            <param name="time">The time span to wait for</param>
+        </member>
+    </members>
+</doc>
