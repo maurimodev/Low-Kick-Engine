@@ -71,17 +71,7 @@ public class SampleGame : Game
         _player = hero.AddComponent<PlayerController>(new PlayerController());
         _player.Start();
 
-        var knight = new Entity("Knight");
-        knight.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
-        knight.AddComponent<Collider>(new Collider(knight.transform));
-        knight.transform.position = new Vector2(40, 100);
-
-        var knight1 = new Entity("Knight");
-        knight1.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
-        knight1.AddComponent<Collider>(new Collider(knight1.transform));
-        knight1.transform.position = new Vector2(100, 100);
-
-
+        SpawnLines();
         // Create camera
         var cameraObject = new Entity("Camera");
         camera = cameraObject.AddComponent<Camera2D>(new Camera2D()) as Camera2D;
@@ -199,11 +189,23 @@ public class SampleGame : Game
                 if (ImGui.Button("Detach Camera from Entity"))
                     camera.AttachToEntity(null);
 
+                ImGui.BeginGroup();
                 ImGui.DragFloat("Player Speed", ref _player.speed);
                 ImGui.DragFloat("Acceleration Scale", ref _player.accelerationScale);
                 ImGui.LabelText("Current Acceleration:",  _player.currentAccel.ToString());
-                ImGui.DragFloat("Jump Height", ref _player.jumpHeight);
-                ImGui.DragFloat("Jump Time until Apex", ref _player.timeUntilApex);
+                ImGui.BeginTabBar("Tab");
+                var jumpMenuOn = ImGui.BeginMenu("Hi");
+                if (jumpMenuOn)
+                {
+                    ImGui.DragFloat("Jump Height", ref _player.jumpHeight);
+                    ImGui.DragFloat("Jump Time until Apex", ref _player.timeUntilApex);
+                    ImGui.DragFloat("Coyote Time Threshold", ref _player.coyoteTimeThreshold);
+                    ImGui.LabelText("Coyote Timer", _player.coyoteTimer.ToString());
+                    ImGui.LabelText("Used Up Coyote", _player.usedUpCoyote.ToString());
+                    ImGui.LabelText("Is Grounded: ", _player.isGrounded.ToString());
+                }
+                ImGui.EndMenu();
+                ImGui.EndTabBar();
             }
         }
         
@@ -239,5 +241,19 @@ public class SampleGame : Game
         hero.transform.position = new Vector2(X, Y);
         hero.AddComponent<Collider>(new Collider(hero.transform));
 
+    }
+
+    private void SpawnLines()
+    {
+        for (int i = 1; i < 90 ; i++)
+        {
+            var hero = new Entity("Floor");
+            hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
+            hero.AddComponent<Collider>(new Collider(hero.transform));
+            var width = hero.GetComponent<Sprite>().rect.Width;
+            var X = width * i;
+            var Y = 100;
+            hero.transform.position = new Vector2(X, Y);
+        }
     }
 }

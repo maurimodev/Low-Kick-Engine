@@ -35,3 +35,7 @@ C:\Users\Mauricio\wkspaces\Low-Kick-Engine\bin\x64\Debug\Coroutine.dll
 C:\Users\Mauricio\wkspaces\Low-Kick-Engine\bin\x64\Debug\System.ValueTuple.dll
 C:\Users\Mauricio\wkspaces\Low-Kick-Engine\bin\x64\Debug\Coroutine.xml
 C:\Users\Mauricio\wkspaces\Low-Kick-Engine\bin\x64\Debug\System.ValueTuple.xml
+C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\Coroutine.dll
+C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\System.ValueTuple.dll
+C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\Coroutine.xml
+C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\System.ValueTuple.xml

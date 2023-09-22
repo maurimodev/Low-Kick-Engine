@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using Coroutine;
 using Microsoft.Xna.Framework;
-
 public class PlayerController : Component
 {
     public Transform transform;
@@ -19,13 +18,13 @@ public class PlayerController : Component
     public float fallAccelerationScale = 15;
     public float currentFallAccel = 0;
     public float maxFallAccel = 3;
-    public float fallMaxSpeed = 90;
+    public float fallMaxSpeed = 60;
     private Vector2 lastAxis;
     
     public float slideSpeed = 5;
     public float bounceOffSpeed = 40;
     public bool isBouncingOff = false;
-    public bool isOnAir = false;
+    public bool isGrounded = false;
     public bool isJumping = false;
 
     // Jumping
@@ -34,8 +33,14 @@ public class PlayerController : Component
     public float timeUntilApex = 0.225f;
     public float jumpMaxAcceleration = 4;
     public float jumpAcceleration = 0;
-    public float jumpAccelerationScale = 50;
+    public float jumpAccelerationScale = 40;
     public float timeUntilFall = 0.1f;
+    public float coyoteTimeThreshold = 0.2f;
+
+    public int cornerThreshold = 4;
+
+    public float coyoteTimer = 0;
+    public bool usedUpCoyote = false;
     public PlayerController()
     {
     }
@@ -49,6 +54,7 @@ public class PlayerController : Component
     {
         var horizontalAxis = InputManager.GetAxis(Axis.LEFT_STICK);
 
+        // HORIZONTAL MOVEMENT
         if (horizontalAxis.X != 0)
         {
             lastAxis = horizontalAxis;
@@ -60,7 +66,7 @@ public class PlayerController : Component
             {
                 currentAccel = maxAccel;
             }
-            MoveX(horizontalAxis.X * speed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, gameTime, null);
+            MoveX(horizontalAxis.X * speed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, null);
         }
         else
         {
@@ -72,27 +78,52 @@ public class PlayerController : Component
             {
                 currentAccel = 0;
             }
-            MoveX(lastAxis.X * slideSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, gameTime, null);
+            MoveX(lastAxis.X * slideSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, null);
         }
 
+        // JUMP INPUT
         if(InputManager.GetInputDown(ControlScheme.A))
         {
-            CoroutineHandler.Start(Jump(gameTime));
+            if(isGrounded)
+                CoroutineHandler.Start(Jump(gameTime));
+            else
+            {
+                if (coyoteTimer > 0 & !usedUpCoyote)
+                {
+                    CoroutineHandler.Start(Jump(gameTime));
+                    usedUpCoyote = true;
+                }
+            }
+
         }
-        if(!collider.CheckCollideAt(transform.position + new Vector2(0, -1)) && !isJumping)
+
+        // GRAVITY / GROUNDED CHECK
+        if(!collider.CheckCollideAt(transform.position + new Vector2(0, 1)) && !isJumping)
         {
+            isGrounded = false;
             if(currentFallAccel < maxFallAccel)
             {
                 currentFallAccel += Time.deltaTime * fallAccelerationScale;
             }
-            MoveY(1 * fallMaxSpeed * Time.deltaTime * currentFallAccel, gameTime, null);
+            MoveY(1 * fallMaxSpeed * Time.deltaTime * currentFallAccel, null);
         }
         else
         {
+            isGrounded = !isJumping;
+            
+            if (!isJumping)
+                usedUpCoyote = false;
+
+            coyoteTimer = coyoteTimeThreshold;
             currentFallAccel = 0;
         }
+
+        if (!isGrounded && coyoteTimer > 0)
+        {
+            coyoteTimer -= Time.deltaTime;
+        }
     }
-    public void MoveX(float amt, GameTime gameTime, Action<int, GameTime> onCollide)
+    public void MoveX(float amt, Action<int, float> onCollide)
     {
         xRemainder += amt;
         var move = (int)Math.Round(xRemainder);
@@ -111,13 +142,13 @@ public class PlayerController : Component
                 {
                     Console.WriteLine("Would collide!");
                     if (onCollide != null)
-                        onCollide(sign, gameTime);
+                        onCollide(sign, Time.deltaTime);
                     break;
                 }
             }
         }
     }
-    public void MoveY(float amt, GameTime gameTime, Action OnCollide)
+    public void MoveY(float amt, Action<Collider> OnCollide)
     {
         yRemainder += amt;
         var move = (int)Math.Round(yRemainder);
@@ -127,17 +158,29 @@ public class PlayerController : Component
             int sign = Math.Sign(move);
             while (move != 0)
             {
-                if(collider.CheckCollideAt(transform.position + new Vector2(0, sign)) == false)
+                if (collider.CheckCollideAt(transform.position + new Vector2(0, sign), out var collide))
+                {
+                    Console.WriteLine("Would collide!");
+                    if (OnCollide != null)
+                        OnCollide(collide);
+
+                    if (isJumping)
+                    {
+                        if (!CheckCornerCorrection(collide))
+                        {
+                            isJumping = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
                 {
                     transform.position.Y += sign;
                     move -= sign;
-                }
-                else
-                { 
-                    Console.WriteLine("Would collide!");
-                    if (OnCollide != null)
-                        OnCollide();
-                    break;
                 }
             }
         }
@@ -150,7 +193,7 @@ public class PlayerController : Component
         while(t0 < timeUntilApex)
         {
             t0 += Time.deltaTime;
-            if (InputManager.GetInputUp(ControlScheme.A))
+            if (InputManager.GetInputUp(ControlScheme.A) || !isJumping)
             {
                 t0 = timeUntilApex;
             }
@@ -158,19 +201,51 @@ public class PlayerController : Component
             {
                 jumpAcceleration += Time.deltaTime * jumpAccelerationScale;
             }
-            MoveY(-jumpSpeed * jumpHeight * Time.deltaTime, gameTime, null);
-           
+            MoveY(-jumpSpeed * jumpHeight * Time.deltaTime, null);
             yield return new Wait(Time.deltaTime);
         }
+
         jumpAcceleration = 0;
         var t1 = 0.0f;
+
         while(t1 < timeUntilFall)
         {
             t1 += Time.deltaTime;
-            MoveY(-jumpHeight * Time.deltaTime * 0.4f, gameTime, null);
+            MoveY(-jumpHeight * Time.deltaTime * 0.4f, null);
             yield return new Wait(Time.deltaTime);
         }
         isJumping = false;
+    }
 
+    public bool CheckCornerCorrection(Collider other)
+    {
+        // Check corners, slide player to left/right if needbe
+
+        var playerRect = collider.bounds;
+        var otherRect = other.bounds;
+
+        // Player is to the left of the other rect
+        if (playerRect.Location.X < otherRect.Location.X)
+        {
+            if (Math.Abs(playerRect.Right - otherRect.Left) <= cornerThreshold)
+            {
+                if (collider.CheckCollideAt(transform.position + new Vector2(-Math.Abs(playerRect.Right - otherRect.Left), 0)))
+                    return false;
+
+                MoveX(-(Math.Abs(playerRect.Right - otherRect.Left)), null);
+                return true;
+            }
+        }
+        else
+        {
+            if (Math.Abs(playerRect.Left - otherRect.Right) <= cornerThreshold)
+            {
+                if (collider.CheckCollideAt(transform.position + new Vector2(Math.Abs(playerRect.Left - otherRect.Right), 0)))
+                    return false;
+                MoveX(Math.Abs(playerRect.Left - otherRect.Right), null);
+                return true;
+            }
+        }
+        return false;
     }
 }

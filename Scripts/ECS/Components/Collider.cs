@@ -38,6 +38,27 @@ public class Collider : Component
         }
     }
 
+    public bool CheckCollideAt(Vector2 position, out Collider collidesWith)
+    {
+        var checkAt = new Rectangle((int)position.X, (int)position.Y, bounds.Width, bounds.Height);
+        Console.WriteLine(checkAt);
+
+        foreach (var component in PhysicsSystem.GetColliders())
+        {
+            if (component == this)
+            {
+                continue;
+            }
+
+            if (checkAt.Intersects(component.bounds))
+            {
+                collidesWith = component;
+                return true;
+            }
+        }
+        collidesWith = null;
+        return false;
+    }
     public bool CheckCollideAt(Vector2 position)
     {
         var checkAt = new Rectangle((int)position.X, (int)position.Y, bounds.Width, bounds.Height);
@@ -54,8 +75,7 @@ public class Collider : Component
             {
                 return true;
             }
-        }
-
+        } 
         return false;
     }
 }
