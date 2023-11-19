@@ -8,6 +8,7 @@ using ImGuiNET;
 using KungFuPlatform;
 using Microsoft.Xna.Framework.Input;
 using Coroutine;
+using KungFuPlatform.src.Graphics;
 
 public class SampleGame : Game
 {
@@ -71,14 +72,18 @@ public class SampleGame : Game
         _player = hero.AddComponent<PlayerController>(new PlayerController());
         _player.Start();
 
+        // Load texturesheet
+        var sheet = Content.Load<Texture2D>("test_texturesheet");
+        var textureSheet = new TextureSheet(sheet, 32, 32);
+        var sheetEntity = new Entity("Sheet");
+        sheetEntity.transform.position = new Vector2(80, 0);
+        sheetEntity.AddComponent<AnimatedSprite>(new AnimatedSprite(textureSheet));
         SpawnLines();
         
         // Create camera
 
         var cameraObject = new Entity("Camera");
         camera = cameraObject.AddComponent<Camera2D>(new Camera2D()) as Camera2D;
-        
-
         // First, load the texture as a Texture2D (can also be done using the XNA/FNA content pipeline)
         _xnaTexture = CreateTexture(GraphicsDevice, 300, 150, pixel =>
         {
@@ -101,9 +106,12 @@ public class SampleGame : Game
         // Update Systems
         Time.Update(gameTime);
         CoroutineHandler.Tick(gameTime.ElapsedGameTime.TotalSeconds);
-        PhysicsSystem.Update(gameTime);
+        
         TransformSystem.Update(gameTime);
+        PhysicsSystem.Update(gameTime);
         InputManager.Update(gameTime);
+        AnimationSystem.Update(gameTime);
+        
         _player.Update(gameTime);
         camera.Update(gameTime);
 
@@ -148,6 +156,7 @@ public class SampleGame : Game
         }
         ImGui.Text("Test key: " + pressedKey.ToString());
         ImGui.SliderFloat("Gravity Scale", ref PhysicsSystem.gravityScale, 0, 1);
+        ImGui.SliderFloat("Time Scale", ref Time.timeScale, 0, 1);
         ImGui.ColorEdit3("clear color", ref clear_color);
         ImGui.Text(string.Format("Application average {0:F3} ms/frame ({1:F1} FPS)", 1000f / ImGui.GetIO().Framerate,
             ImGui.GetIO().Framerate));

@@ -89,21 +89,26 @@
     <Compile Include="ImGuiRenderer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="SampleGame.cs" />
-    <Compile Include="Scripts\ECS\Components\Camera2D.cs" />
-    <Compile Include="Scripts\ECS\Components\Collider.cs" />
-    <Compile Include="Scripts\ECS\Components\PlayerController.cs" />
-    <Compile Include="Scripts\ECS\Systems\BaseSystem.cs" />
-    <Compile Include="Scripts\ECS\Systems\DrawQueue.cs" />
-    <Compile Include="Scripts\ECS\Component.cs" />
-    <Compile Include="Scripts\ECS\Components\Sprite.cs" />
-    <Compile Include="Scripts\ECS\Entity.cs" />
-    <Compile Include="Scripts\ECS\Components\Transform.cs" />
-    <Compile Include="Scripts\ECS\Systems\PhysicsSystem.cs" />
-    <Compile Include="Scripts\InputManager.cs" />
-    <Compile Include="Scripts\Physics2D.cs" />
-    <Compile Include="Scripts\ECS\Systems\TransformSystem.cs" />
-    <Compile Include="Scripts\Time.cs" />
-    <Compile Include="Scripts\Utilities\Vector2Extensions.cs" />
+    <Compile Include="src\ECS\Components\AnimatedSprite.cs" />
+    <Compile Include="src\ECS\Components\Camera2D.cs" />
+    <Compile Include="src\ECS\Components\Collider.cs" />
+    <Compile Include="src\ECS\Components\PlayerController.cs" />
+    <Compile Include="src\ECS\Systems\AnimationSystem.cs" />
+    <Compile Include="src\ECS\Systems\BaseSystem.cs" />
+    <Compile Include="src\ECS\Systems\DrawQueue.cs" />
+    <Compile Include="src\ECS\Component.cs" />
+    <Compile Include="src\ECS\Components\Sprite.cs" />
+    <Compile Include="src\ECS\Entity.cs" />
+    <Compile Include="src\ECS\Components\Transform.cs" />
+    <Compile Include="src\ECS\Systems\PhysicsSystem.cs" />
+    <Compile Include="src\Graphics\Animation.cs" />
+    <Compile Include="src\Graphics\TextureSheet.cs" />
+    <Compile Include="src\InputManager.cs" />
+    <Compile Include="src\Math\RectangleF.cs" />
+    <Compile Include="src\Physics2D.cs" />
+    <Compile Include="src\ECS\Systems\TransformSystem.cs" />
+    <Compile Include="src\Time.cs" />
+    <Compile Include="src\Utilities\Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Coroutine, Version=2.1.5.0, Culture=neutral, processorArchitecture=MSIL">
@@ -138,7 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
-    <Folder Include="Scripts\ECS\Systems\Physics\" />
+    <Folder Include="src\ECS\Systems\Physics\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
