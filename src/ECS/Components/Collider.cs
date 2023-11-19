@@ -1,4 +1,5 @@
 ﻿using System;
+using ImGuiNET;
 using KungFuPlatform.Scripts.Math;
 using Microsoft.Xna.Framework;
 
@@ -31,8 +32,8 @@ public class Collider : Component
 
     public override void Update(GameTime gameTime)
     {
-        bounds.X = entity.transform.position.X + offset.X * scale.X;
-        bounds.Y = entity.transform.position.Y + offset.Y * scale.Y;
+        bounds.X = entity.transform.position.X + offset.X;
+        bounds.Y = entity.transform.position.Y + offset.Y;
 
         if (checkAlways && enabled)
         {
@@ -54,7 +55,7 @@ public class Collider : Component
 
     public bool CheckCollideAt(Vector2 position, out Collider collidesWith)
     {
-        var checkAt = new RectangleF(position.X + offset.X, position.Y + offset.Y, bounds.Width * scale.X, bounds.Height * scale.Y);
+        var checkAt = new RectangleF(position.X + offset.X, position.Y + offset.Y, bounds.Width * scale.X * entity.transform.scale.X, bounds.Height * scale.Y * entity.transform.scale.Y);
         //Console.WriteLine(checkAt);
 
         foreach (var component in PhysicsSystem.GetColliders())
@@ -75,7 +76,7 @@ public class Collider : Component
     }
     public bool CheckCollideAt(Vector2 position)
     {
-        var checkAt = new RectangleF(position.X + offset.X, position.Y + offset.Y, bounds.Width * scale.X, bounds.Height * scale.Y);
+        var checkAt = new RectangleF(position.X + offset.X, position.Y + offset.Y, bounds.Width * scale.X * entity.transform.scale.X, bounds.Height * scale.Y * entity.transform.scale.Y);
         //Console.WriteLine(checkAt);
 
         foreach (var component in PhysicsSystem.GetColliders())
@@ -95,6 +96,8 @@ public class Collider : Component
 
     public void ImGuiLayout()
     {
+        var rect = new RectangleF(entity.transform.position.X + offset.X, entity.transform.position.Y + offset.Y, bounds.Width * scale.X * entity.transform.scale.X, bounds.Height * scale.Y * entity.transform.scale.Y);
+        ImGui.LabelText("", rect.ToString());
         var numOffset = offset.TranslateVector2();
         var numScale = scale.TranslateVector2();
         ImGuiNET.ImGui.DragFloat2("Collider Offset", ref numOffset, 0.1f);

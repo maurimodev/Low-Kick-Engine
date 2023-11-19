@@ -10,6 +10,27 @@ public class Animation
     public bool Looping = true;
     public bool Playing = false;
     public float Speed = 1.0f;
+    public float Duration
+    {
+        get
+        {
+            float duration = 0.0f;
+            foreach (var frame in Frames)
+            {
+                duration += frame.Duration;
+            }
+
+            return duration;
+        }
+    }
+    public float ElapsedTime;
+    public float ElapsedPercentage
+    {
+        get
+        {
+            return Mathf.InverseLerp(0.0f, Duration, ElapsedTime);
+        }
+    }
     
     public float CurrentFrameTime = 0.0f;
     public int CurrentFrame = 0;
@@ -85,6 +106,7 @@ public class Animation
         if(Playing)
         {
             CurrentFrameTime += deltaTime * Speed;
+            ElapsedTime += deltaTime;
             if(CurrentFrameTime >= Frames[CurrentFrame].Duration)
             {
                 CurrentFrameTime = 0.0f;
@@ -94,11 +116,13 @@ public class Animation
                     if(Looping)
                     {
                         CurrentFrame = 0;
+                        ElapsedTime = 0;
                         OnAnimationLoop?.Invoke();
                     }
                     else
                     {
                         CurrentFrame = Frames.Count - 1;
+                        ElapsedTime = 1;
                         Playing = false;
                         OnAnimationEnd?.Invoke();
                     }
@@ -116,7 +140,7 @@ public class Animation
     {
         CurrentFrame = 0;
         CurrentFrameTime = 0;
-        
+        ElapsedTime = 0;
         Playing = true;
         
         OnAnimationStart?.Invoke();

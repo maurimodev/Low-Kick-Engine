@@ -8,7 +8,10 @@ using ImGuiNET;
 using KungFuPlatform;
 using Microsoft.Xna.Framework.Input;
 using Coroutine;
+using KungFuPlatform.Editor;
+using KungFuPlatform.Editor.Windows;
 using KungFuPlatform.src.Graphics;
+using SDL2;
 
 public class SampleGame : Game
 {
@@ -21,19 +24,22 @@ public class SampleGame : Game
     private Texture2D _xnaTexture;
     private IntPtr _imGuiTexture;
 
+    private RenderWindow gameView;
+    private TextureViewerWindow textureViewerWindow;
+    
     private float f = 0.0f;
     private int goSelection = 0;
 
     private bool show_test_window = false;
     private bool show_another_window = false;
     private Num.Vector3 clear_color = new Num.Vector3(114f / 255f, 144f / 255f, 154f / 255f);
-    private byte[] _textBuffer = new byte[100];
     private Keys pressedKey;
     private bool isCheckingForInput;
     private Keys leftKey;
     private Keys rightKey;
 
     private Camera2D camera;
+    public Num.Vector2 gameWindowSize = new Num.Vector2(1280, 720);
     public SampleGame()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -55,6 +61,15 @@ public class SampleGame : Game
         ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;
 
         InputManager.Initialize();
+        
+        // Create windows
+        textureViewerWindow = new TextureViewerWindow(_graphics);
+        
+        gameView = new RenderWindow(_graphics);
+        gameView.Title = "Game View";
+        gameView.Size = new Num.Vector2(1280, 720);
+        gameView.Position = new Num.Vector2(0, 0);
+        
         base.Initialize();
     }
 
@@ -93,6 +108,7 @@ public class SampleGame : Game
 
         // Then, bind it to an ImGui-friendly pointer, that we can use during regular ImGui.** calls (see below)
         _imGuiTexture = _imGuiRenderer.BindTexture(_xnaTexture);
+
         base.LoadContent();
     }
 
@@ -131,14 +147,10 @@ public class SampleGame : Game
 
     protected override void Draw(GameTime gameTime)
     {
+        // Render Views
+
+        gameView.Render(Time.deltaTime, batch, _drawQueue, camera);
         GraphicsDevice.Clear(new Color(clear_color.X, clear_color.Y, clear_color.Z, 1));
-
-        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
-            DepthStencilState.DepthRead, RasterizerState.CullNone, null, camera.GetTransformation(GraphicsDevice));
-        _drawQueue.DrawAllInQueue(batch);
-
-        batch.End();
-
         _imGuiRenderer.BeforeLayout(gameTime);
         ImGuiLayout();
         _imGuiRenderer.AfterLayout();
@@ -149,6 +161,20 @@ public class SampleGame : Game
     {
         // 1. Show a simple window
         // Tip: if we don't call ImGui.Begin()/ImGui.End() the widgets appears in a window automatically called "Debug"
+        ImGui.BeginMainMenuBar();
+        
+        if(ImGui.Button("Reset Game View"))
+        {
+            gameWindowSize = new Num.Vector2(1280, 720);
+        }
+        
+        ImGui.EndMainMenuBar();
+
+        ImGui.Begin("Low Kick Engine",
+            ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse |
+            ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+        ImGui.SetWindowSize(new Num.Vector2(Window.ClientBounds.Width, Window.ClientBounds.Height));
+        ImGui.SetWindowPos( new Num.Vector2(0, 0));
         ImGui.Begin("Test1");
         if (ImGui.Button("Check key input"))
         {
@@ -157,6 +183,7 @@ public class SampleGame : Game
         ImGui.Text("Test key: " + pressedKey.ToString());
         ImGui.SliderFloat("Gravity Scale", ref PhysicsSystem.gravityScale, 0, 1);
         ImGui.SliderFloat("Time Scale", ref Time.timeScale, 0, 1);
+        ImGui.Checkbox("Draw Debug", ref DrawQueue.DrawDebug);
         ImGui.ColorEdit3("clear color", ref clear_color);
         ImGui.Text(string.Format("Application average {0:F3} ms/frame ({1:F1} FPS)", 1000f / ImGui.GetIO().Framerate,
             ImGui.GetIO().Framerate));
@@ -177,19 +204,21 @@ public class SampleGame : Game
         transform.ImGuiLayout();
 
         if (ImGui.Button("Attach Camera to this Entity"))
-            camera.AttachToEntity(_player.entity);
+            camera.AttachToEntity(transform.entity);
 
         if (ImGui.Button("Detach Camera from Entity"))
             camera.AttachToEntity(null);
-
         if (transform.entity.TryGetComponent(out Camera2D cam))
             cam.ImGuiLayout();
         if(transform.entity.TryGetComponent(out Collider col))
             col.ImGuiLayout();
         if (transform.entity.TryGetComponent(out PlayerController player))
             player.ImGuiLayout();
-
+        
         ImGui.End();
+
+        gameView.ImGuiLayout(_imGuiRenderer);
+        textureViewerWindow.ImGuiLayout(_imGuiRenderer);
     }
     public static Texture2D CreateTexture(GraphicsDevice device, int width, int height, Func<int, Color> paint)
     {

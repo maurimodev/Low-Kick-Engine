@@ -101,9 +101,13 @@
     <Compile Include="src\ECS\Entity.cs" />
     <Compile Include="src\ECS\Components\Transform.cs" />
     <Compile Include="src\ECS\Systems\PhysicsSystem.cs" />
+    <Compile Include="src\Editor\RenderWindow.cs" />
+    <Compile Include="src\Editor\Window.cs" />
+    <Compile Include="src\Editor\Windows\TextureViewerWindow.cs" />
     <Compile Include="src\Graphics\Animation.cs" />
     <Compile Include="src\Graphics\TextureSheet.cs" />
     <Compile Include="src\InputManager.cs" />
+    <Compile Include="src\Math\Mathf.cs" />
     <Compile Include="src\Math\RectangleF.cs" />
     <Compile Include="src\Physics2D.cs" />
     <Compile Include="src\ECS\Systems\TransformSystem.cs" />

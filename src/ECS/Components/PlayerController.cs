@@ -260,6 +260,7 @@ public class PlayerController : Component
     public void ImGuiLayout()
     {
         ImGui.BeginGroup();
+        ImGui.LabelText("Collider Rect: ", collider.bounds.ToString());
         ImGui.DragFloat("Player Speed", ref speed);
         ImGui.DragFloat("Acceleration Scale", ref accelerationScale);
         ImGui.LabelText("Current Acceleration:", currentAccel.ToString());

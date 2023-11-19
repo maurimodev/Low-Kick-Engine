@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using KungFuPlatform.Scripts.Math;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 public class DrawQueue
 {
-    public static bool DrawDebug = true;
+    public static bool DrawDebug = false;
     protected static List<Sprite> sprites = new List<Sprite>();
     protected static List<AnimatedSprite> animatedSprites = new();
     protected static List<Collider> colliders = new List<Collider>();
@@ -61,21 +63,41 @@ public class DrawQueue
         }
         if (DrawDebug)
         {
+            var pixel = new Texture2D(batch.GraphicsDevice, 1, 1);
+            pixel.SetData(new[] { Color.White });
             foreach (var collider in colliders)
             {
-                var tex = new Texture2D(batch.GraphicsDevice, (int)collider.bounds.Width, (int)collider.bounds.Height);
+                // Left Side
+                batch.Draw(pixel, new RectangleF((collider.entity.transform.position.X + collider.offset.X - 1), 
+                        collider.entity.transform.position.Y + collider.offset.Y, 
+                        1, 
+                        collider.bounds.Height * collider.scale.Y * collider.entity.transform.scale.Y),
+                    Color.Green);
+                
+                // Right Side
+                var rectRight = new RectangleF(
+                    (collider.bounds.Width * collider.scale.X * collider.entity.transform.scale.X) + collider.entity.transform.position.X + collider.offset.X - 1,
+                    collider.entity.transform.position.Y + collider.offset.Y,
+                    1,
+                    collider.bounds.Height * collider.scale.Y * collider.entity.transform.scale.Y);
 
-                Color[] data = new Color[tex.Width * tex.Height];
-                for (var pixel = 0; pixel < data.Length; pixel++)
-                {
-                    //the function applies the color according to the specified pixel
-                    data[pixel] = new Color(255, 255, 255, 0.6f);
-                }
-
-                tex.SetData(data);
-                batch.Draw(tex, new Vector2(collider.entity.transform.position.X + collider.offset.X, collider.entity.transform.position.Y + collider.offset.Y), null, Color.Green,
-                    collider.entity.transform.rotation, collider.origin, collider.scale * collider.entity.transform.scale, SpriteEffects.None,
-                    collider.entity.transform.layerDepth);
+                Console.WriteLine(rectRight);
+                
+                batch.Draw(pixel, rectRight,
+                    Color.Green);
+                // Top Side
+                batch.Draw(pixel, new RectangleF(collider.entity.transform.position.X + collider.offset.X, 
+                        collider.entity.transform.position.Y - 1 + collider.offset.Y, 
+                        collider.bounds.Width * collider.scale.X * collider.entity.transform.scale.X , 
+                        1),
+                    Color.Green);
+                
+                // Bottom Side
+                batch.Draw(pixel, new RectangleF(collider.entity.transform.position.X + collider.offset.X, 
+                        (collider.bounds.Height * collider.scale.Y * collider.entity.transform.scale.Y) + collider.entity.transform.position.Y + collider.offset.Y - 1, 
+                        collider.bounds.Width * collider.scale.X * collider.entity.transform.scale.X ,
+                        1),
+                    Color.Green);
             }
         }
     }
