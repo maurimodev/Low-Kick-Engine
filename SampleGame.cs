@@ -42,7 +42,7 @@ public class SampleGame : Game
         _graphics.PreferMultiSampling = true;
 
         IsMouseVisible = true;
-
+        IsFixedTimeStep = true;
         Content.RootDirectory = "Content";
     }
 
@@ -65,14 +65,16 @@ public class SampleGame : Game
         _drawQueue = new DrawQueue();
 
         var hero = new Entity("Hero");
-        hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
-        hero.AddComponent<Collider>(new Collider(hero.transform));
+        hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle"), hero.transform));
+        hero.AddComponent<Collider>(new Collider(hero.transform, 21, 42));
         hero.transform.position = new Vector2(40, 0);
         _player = hero.AddComponent<PlayerController>(new PlayerController());
         _player.Start();
 
         SpawnLines();
+        
         // Create camera
+
         var cameraObject = new Entity("Camera");
         camera = cameraObject.AddComponent<Camera2D>(new Camera2D()) as Camera2D;
         
@@ -132,10 +134,7 @@ public class SampleGame : Game
         _imGuiRenderer.BeforeLayout(gameTime);
         ImGuiLayout();
         _imGuiRenderer.AfterLayout();
-
         base.Draw(gameTime);
-
-
     }
 
     protected virtual void ImGuiLayout()
@@ -148,7 +147,7 @@ public class SampleGame : Game
             isCheckingForInput = true;
         }
         ImGui.Text("Test key: " + pressedKey.ToString());
-        ImGui.SliderFloat("float", ref f, 0.0f, 1.0f, string.Empty);
+        ImGui.SliderFloat("Gravity Scale", ref PhysicsSystem.gravityScale, 0, 1);
         ImGui.ColorEdit3("clear color", ref clear_color);
         ImGui.Text(string.Format("Application average {0:F3} ms/frame ({1:F1} FPS)", 1000f / ImGui.GetIO().Framerate,
             ImGui.GetIO().Framerate));
@@ -166,49 +165,21 @@ public class SampleGame : Game
             ImGui.ListBox("", ref goSelection, TransformSystem.GetGameObjectNames(), TransformSystem.GetComponentCount());
 
         var transform = TransformSystem.GetComponentByIndex(goSelection);
-        var numPos = transform.position.TranslateVector2();
-        
-        ImGui.DragFloat2("Position", ref numPos);
-        transform.position = numPos.TranslateVector2();
-        ImGui.DragFloat("Rotation", ref transform.rotation, 0.05f);
+        transform.ImGuiLayout();
 
-        if (transform.entity.ContainsComponent<Camera2D>())
-        {
-            ImGui.DragFloat("Zoom", ref camera.zoom, 0.05f);
-        }
-        else
-        {
-            var numScale = transform.scale.TranslateVector2();
-            ImGui.DragFloat2("Scale", ref numScale);
-            transform.scale = numScale.TranslateVector2();
-            if (transform.entity.ContainsComponent<PlayerController>())
-            {
-                if(ImGui.Button("Attach Camera to this Entity"))
-                    camera.AttachToEntity(_player.entity);
+        if (ImGui.Button("Attach Camera to this Entity"))
+            camera.AttachToEntity(_player.entity);
 
-                if (ImGui.Button("Detach Camera from Entity"))
-                    camera.AttachToEntity(null);
+        if (ImGui.Button("Detach Camera from Entity"))
+            camera.AttachToEntity(null);
 
-                ImGui.BeginGroup();
-                ImGui.DragFloat("Player Speed", ref _player.speed);
-                ImGui.DragFloat("Acceleration Scale", ref _player.accelerationScale);
-                ImGui.LabelText("Current Acceleration:",  _player.currentAccel.ToString());
-                ImGui.BeginTabBar("Tab");
-                var jumpMenuOn = ImGui.BeginMenu("Hi");
-                if (jumpMenuOn)
-                {
-                    ImGui.DragFloat("Jump Height", ref _player.jumpHeight);
-                    ImGui.DragFloat("Jump Time until Apex", ref _player.timeUntilApex);
-                    ImGui.DragFloat("Coyote Time Threshold", ref _player.coyoteTimeThreshold);
-                    ImGui.LabelText("Coyote Timer", _player.coyoteTimer.ToString());
-                    ImGui.LabelText("Used Up Coyote", _player.usedUpCoyote.ToString());
-                    ImGui.LabelText("Is Grounded: ", _player.isGrounded.ToString());
-                }
-                ImGui.EndMenu();
-                ImGui.EndTabBar();
-            }
-        }
-        
+        if (transform.entity.TryGetComponent(out Camera2D cam))
+            cam.ImGuiLayout();
+        if(transform.entity.TryGetComponent(out Collider col))
+            col.ImGuiLayout();
+        if (transform.entity.TryGetComponent(out PlayerController player))
+            player.ImGuiLayout();
+
         ImGui.End();
     }
     public static Texture2D CreateTexture(GraphicsDevice device, int width, int height, Func<int, Color> paint)
@@ -237,7 +208,7 @@ public class SampleGame : Game
         var Y = random.Next(0,400);
 
         var hero = new Entity("Hero");
-        hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
+        hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle"), hero.transform));
         hero.transform.position = new Vector2(X, Y);
         hero.AddComponent<Collider>(new Collider(hero.transform));
 
@@ -248,7 +219,7 @@ public class SampleGame : Game
         for (int i = 1; i < 90 ; i++)
         {
             var hero = new Entity("Floor");
-            hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle")));
+            hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle"), hero.transform));
             hero.AddComponent<Collider>(new Collider(hero.transform));
             var width = hero.GetComponent<Sprite>().rect.Width;
             var X = width * i;

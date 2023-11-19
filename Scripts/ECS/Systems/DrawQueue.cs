@@ -4,16 +4,28 @@ using Microsoft.Xna.Framework.Graphics;
 
 public class DrawQueue
 {
+    public static bool DrawDebug = true;
     protected static List<Sprite> sprites = new List<Sprite>();
+    protected static List<Collider> colliders = new List<Collider>();
 
     public static void RegisterForDraw(Sprite sprite)
     {
         sprites.Add(sprite);
     }
 
+    public static void RegisterForDebugDraw(Collider collider)
+    {
+        colliders.Add(collider);
+    }
+
     public static void UnregisterForDraw(Sprite sprite)
     {
         sprites.Remove(sprite);
+    }
+
+    public static void UnregisterForDebugDraw(Collider collider)
+    {
+        colliders.Remove(collider);
     }
 
     public void DrawAllInQueue(SpriteBatch batch)
@@ -33,23 +45,26 @@ public class DrawQueue
                 sprite.entity.transform.scale,
                 SpriteEffects.None,
                 sprite.entity.transform.layerDepth);
-            
-            //initialize a texture
-            var texture = new Texture2D(batch.GraphicsDevice, sprite.texture.Width, sprite.texture.Height);
+        }
 
-            //the array holds the color for each pixel in the texture
-            Color[] data = new Color[texture.Width * texture.Height];
-            for (var pixel = 0; pixel < data.Length; pixel++)
+        if (DrawDebug)
+        {
+            foreach (var collider in colliders)
             {
-                //the function applies the color according to the specified pixel
-                data[pixel] = new Color(255, 0, 0, 0.2f);
+                var tex = new Texture2D(batch.GraphicsDevice, collider.bounds.Width, collider.bounds.Height);
+
+                Color[] data = new Color[tex.Width * tex.Height];
+                for (var pixel = 0; pixel < data.Length; pixel++)
+                {
+                    //the function applies the color according to the specified pixel
+                    data[pixel] = new Color(255, 255, 255, 0.6f);
+                }
+
+                tex.SetData(data);
+                batch.Draw(tex, new Vector2(collider.bounds.X, collider.bounds.Y), null, Color.Green,
+                    collider.entity.transform.rotation, collider.origin, collider.entity.transform.scale, SpriteEffects.None,
+                    collider.entity.transform.layerDepth);
             }
-
-            //set the color
-            texture.SetData(data);
-
-            batch.Draw(texture, sprite.entity.transform.position, null, Color.White, sprite.entity.transform.rotation, sprite.pivot, sprite.entity.transform.scale, SpriteEffects.None, sprite.entity.transform.layerDepth);
-            
         }
     }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Coroutine;
+using ImGuiNET;
 using Microsoft.Xna.Framework;
 public class PlayerController : Component
 {
@@ -22,19 +23,18 @@ public class PlayerController : Component
     private Vector2 lastAxis;
     
     public float slideSpeed = 5;
-    public float bounceOffSpeed = 40;
-    public bool isBouncingOff = false;
     public bool isGrounded = false;
     public bool isJumping = false;
 
     // Jumping
-    public float jumpHeight = 18;
+    public float jumpHeight = 5;
     public float jumpSpeed = 10;
-    public float timeUntilApex = 0.225f;
+    public float timeUntilApex = 0.150f;
     public float jumpMaxAcceleration = 4;
     public float jumpAcceleration = 0;
-    public float jumpAccelerationScale = 40;
-    public float timeUntilFall = 0.1f;
+    public float jumpAccelerationScale = 60;
+    public float jumpDeccelerationScale = 20;
+    public float timeUntilFall = 0.06f;
     public float coyoteTimeThreshold = 0.2f;
 
     public int cornerThreshold = 4;
@@ -52,39 +52,39 @@ public class PlayerController : Component
     }
     public override void Update(GameTime gameTime)
     {
-        var horizontalAxis = InputManager.GetAxis(Axis.LEFT_STICK);
+        var axis = InputManager.GetAxis(Axis.LEFT_STICK);
 
         // HORIZONTAL MOVEMENT
-        if (horizontalAxis.X != 0)
+        if (axis.X != 0)
         {
-            lastAxis = horizontalAxis;
+            lastAxis = axis;
             if (currentAccel < maxAccel)
             {
-                currentAccel += (float)gameTime.ElapsedGameTime.TotalSeconds * accelerationScale;
+                currentAccel += Time.deltaTime * accelerationScale;
             }
             else
             {
                 currentAccel = maxAccel;
             }
-            MoveX(horizontalAxis.X * speed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, null);
+            MoveX(axis.X * speed * Time.deltaTime * currentAccel, null);
         }
         else
         {
             if (currentAccel > 0)
             {
-                currentAccel -= (float)gameTime.ElapsedGameTime.TotalSeconds * deccelerationScale;
+                currentAccel -= Time.deltaTime * deccelerationScale;
             }
             else
             {
                 currentAccel = 0;
             }
-            MoveX(lastAxis.X * slideSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds * currentAccel, null);
+            MoveX(lastAxis.X * slideSpeed * Time.deltaTime * currentAccel, null);
         }
 
         // JUMP INPUT
         if(InputManager.GetInputDown(ControlScheme.A))
         {
-            if(isGrounded)
+            if(isGrounded && !isJumping)
                 CoroutineHandler.Start(Jump(gameTime));
             else
             {
@@ -105,11 +105,11 @@ public class PlayerController : Component
             {
                 currentFallAccel += Time.deltaTime * fallAccelerationScale;
             }
-            MoveY(1 * fallMaxSpeed * Time.deltaTime * currentFallAccel, null);
+            MoveY(1 * fallMaxSpeed * Time.deltaTime * currentFallAccel * PhysicsSystem.gravityScale, OnFallCollide);
         }
         else
         {
-            isGrounded = !isJumping;
+            isGrounded = true;
             
             if (!isJumping)
                 usedUpCoyote = false;
@@ -133,7 +133,7 @@ public class PlayerController : Component
             int sign = Math.Sign(move);
             while (move != 0)
             {
-                if(collider.CheckCollideAt(transform.position + new Vector2(sign, 0)) == false)
+                if(collider.CheckCollideAt(new Vector2(transform.position.X + sign, transform.position.Y)) == false)
                 {
                     transform.position.X += sign;
                     move -= sign;
@@ -151,16 +151,17 @@ public class PlayerController : Component
     public void MoveY(float amt, Action<Collider> OnCollide)
     {
         yRemainder += amt;
-        var move = (int)Math.Round(yRemainder);
+        var move = (int)yRemainder;
         if (move != 0)
         {
             yRemainder -= move;
             int sign = Math.Sign(move);
             while (move != 0)
             {
-                if (collider.CheckCollideAt(transform.position + new Vector2(0, sign), out var collide))
+                if (collider.CheckCollideAt(new Vector2(transform.position.X, transform.position.Y + sign), out var collide))
                 {
                     Console.WriteLine("Would collide!");
+
                     if (OnCollide != null)
                         OnCollide(collide);
 
@@ -188,8 +189,10 @@ public class PlayerController : Component
 
     public IEnumerator<Wait> Jump(GameTime gameTime)
     {
+        usedUpCoyote = true;
         isJumping = true;
         var t0 = 0.0f;
+        jumpAcceleration = jumpMaxAcceleration / 1.5f;
         while(t0 < timeUntilApex)
         {
             t0 += Time.deltaTime;
@@ -197,21 +200,26 @@ public class PlayerController : Component
             {
                 t0 = timeUntilApex;
             }
-            if (jumpAcceleration < jumpAccelerationScale)
+            if (jumpAcceleration >= jumpMaxAcceleration)
+            {
+                jumpAcceleration -= Time.deltaTime * jumpDeccelerationScale;
+            }
+            else
             {
                 jumpAcceleration += Time.deltaTime * jumpAccelerationScale;
             }
-            MoveY(-jumpSpeed * jumpHeight * Time.deltaTime, null);
+            MoveY(-jumpSpeed * jumpHeight * jumpAcceleration * Time.deltaTime, null);
             yield return new Wait(Time.deltaTime);
         }
-
         jumpAcceleration = 0;
         var t1 = 0.0f;
 
         while(t1 < timeUntilFall)
         {
+            if (InputManager.GetInputUp(ControlScheme.A))
+                t1 = timeUntilFall;
             t1 += Time.deltaTime;
-            MoveY(-jumpHeight * Time.deltaTime * 0.4f, null);
+            MoveY(jumpSpeed * -jumpHeight * Time.deltaTime * 0.4f, null);
             yield return new Wait(Time.deltaTime);
         }
         isJumping = false;
@@ -247,5 +255,35 @@ public class PlayerController : Component
             }
         }
         return false;
+    }
+
+    public void ImGuiLayout()
+    {
+        ImGui.BeginGroup();
+        ImGui.DragFloat("Player Speed", ref speed);
+        ImGui.DragFloat("Acceleration Scale", ref accelerationScale);
+        ImGui.LabelText("Current Acceleration:", currentAccel.ToString());
+        ImGui.BeginTabBar("Tab");
+        var jumpMenuOn = ImGui.BeginMenu("Jump Properties");
+        if (jumpMenuOn)
+        {
+            ImGui.DragFloat("Jump Speed", ref jumpSpeed);
+            ImGui.DragFloat("Jump Height", ref jumpHeight);
+            ImGui.DragFloat("Jump Acceleration Scale", ref jumpAccelerationScale);
+            ImGui.DragFloat("Jump Time Until Apex", ref timeUntilApex);
+            ImGui.DragFloat("Time Until Fall", ref timeUntilFall);
+            ImGui.DragFloat("Coyote Time Threshold", ref coyoteTimeThreshold);
+            ImGui.LabelText("Coyote Timer", coyoteTimer.ToString());
+            ImGui.LabelText("Used Up Coyote", usedUpCoyote.ToString());
+            ImGui.LabelText("Is Grounded: ", isGrounded.ToString());
+            ImGui.LabelText("Is Jumping: ", isJumping.ToString());
+        }
+        ImGui.EndMenu();
+        ImGui.EndTabBar();
+    }
+    // ON COLLIDE
+    public void OnFallCollide(Collider collideWith)
+    {
+        MoveY(-Math.Abs(collideWith.bounds.Top - collider.bounds.Bottom), null);
     }
 }

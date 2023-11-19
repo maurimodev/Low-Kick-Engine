@@ -3,6 +3,7 @@
 public class Component
 {
     public Entity entity;
+
     public virtual void Start()
     {
 

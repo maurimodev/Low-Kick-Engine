@@ -46,6 +46,19 @@ public class Entity
         return null;
     }
 
+    public bool TryGetComponent<T>(out T component) where T : Component
+    {
+        foreach (Component c in components)
+        {
+            if (c.GetType() == typeof(T))
+            {
+                component = (T)c;
+                return true;
+            }
+        }
+        component = null;
+        return false;
+    }
     public bool ContainsComponent<T>() where T : Component
     {
         foreach (Component component in components)

@@ -76,4 +76,9 @@ public class Camera2D : Component
                               device.Viewport.Height * 0.5f, 0));
         return matrixTransform;
     }
+
+    public void ImGuiLayout()
+    {
+        ImGuiNET.ImGui.DragFloat("Zoom", ref zoom);
+    }
 }

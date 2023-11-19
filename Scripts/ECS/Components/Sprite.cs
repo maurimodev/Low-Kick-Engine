@@ -6,11 +6,12 @@ public class Sprite : Component
     public Texture2D texture;
     public Rectangle rect;
     public Vector2 pivot = Vector2.Zero;
-    public Sprite(Texture2D texture)
+    public Sprite(Texture2D texture, Transform transform)
     {
         this.texture = texture;
-        rect = texture.Bounds;
-        pivot = new Vector2(rect.Width / 2, rect.Height / 2);
+        rect = new Rectangle((int)transform.position.X, (int)transform.position.Y, texture.Width,
+            texture.Height);
+        pivot = Vector2.Zero;
         DrawQueue.RegisterForDraw(this);
     }
     public override void Start()
