@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using KungFuPlatform.Editor.Windows;
 using KungFuPlatform.Scripts.Math;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -80,8 +81,6 @@ public class DrawQueue
                     collider.entity.transform.position.Y + collider.offset.Y,
                     1,
                     collider.bounds.Height * collider.scale.Y * collider.entity.transform.scale.Y);
-
-                Console.WriteLine(rectRight);
                 
                 batch.Draw(pixel, rectRight,
                     Color.Green);

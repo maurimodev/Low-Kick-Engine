@@ -26,6 +26,7 @@ public class SampleGame : Game
 
     private RenderWindow gameView;
     private TextureViewerWindow textureViewerWindow;
+    private ConsoleWindow consoleWindow;
     
     private float f = 0.0f;
     private int goSelection = 0;
@@ -64,7 +65,7 @@ public class SampleGame : Game
         
         // Create windows
         textureViewerWindow = new TextureViewerWindow(_graphics);
-        
+        consoleWindow = new ConsoleWindow();
         gameView = new RenderWindow(_graphics);
         gameView.Title = "Game View";
         gameView.Size = new Num.Vector2(1280, 720);
@@ -170,11 +171,7 @@ public class SampleGame : Game
         
         ImGui.EndMainMenuBar();
 
-        ImGui.Begin("Low Kick Engine",
-            ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse |
-            ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-        ImGui.SetWindowSize(new Num.Vector2(Window.ClientBounds.Width, Window.ClientBounds.Height));
-        ImGui.SetWindowPos( new Num.Vector2(0, 0));
+        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport());
         ImGui.Begin("Test1");
         if (ImGui.Button("Check key input"))
         {
@@ -219,6 +216,7 @@ public class SampleGame : Game
 
         gameView.ImGuiLayout(_imGuiRenderer);
         textureViewerWindow.ImGuiLayout(_imGuiRenderer);
+        consoleWindow.ImGuiLayout(_imGuiRenderer);
     }
     public static Texture2D CreateTexture(GraphicsDevice device, int width, int height, Func<int, Color> paint)
     {
@@ -257,10 +255,9 @@ public class SampleGame : Game
         for (int i = 1; i < 90 ; i++)
         {
             var hero = new Entity("Floor");
-            hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("chara_idle"), hero.transform));
-            hero.AddComponent<Collider>(new Collider(hero.transform));
-            var width = hero.GetComponent<Sprite>().rect.Width;
-            var X = width * i;
+            var sprite = hero.AddComponent<Sprite>(new Sprite(Content.Load<Texture2D>("collider_square"), hero.transform));
+            hero.AddComponent<Collider>(new Collider(hero.transform, sprite.rect.Width, sprite.rect.Height));
+            var X = sprite.rect.Width * i;
             var Y = 100;
             hero.transform.position = new Vector2(X, Y);
         }

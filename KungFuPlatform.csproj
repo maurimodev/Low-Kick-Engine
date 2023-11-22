@@ -103,6 +103,7 @@
     <Compile Include="src\ECS\Systems\PhysicsSystem.cs" />
     <Compile Include="src\Editor\RenderWindow.cs" />
     <Compile Include="src\Editor\Window.cs" />
+    <Compile Include="src\Editor\Windows\ConsoleWindow.cs" />
     <Compile Include="src\Editor\Windows\TextureViewerWindow.cs" />
     <Compile Include="src\Graphics\Animation.cs" />
     <Compile Include="src\Graphics\TextureSheet.cs" />

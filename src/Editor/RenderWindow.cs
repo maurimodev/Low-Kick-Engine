@@ -16,7 +16,7 @@ public class RenderWindow
 
     public bool Visible = true;
 
-    private bool lockedSize = false;
+    private bool lockedSize = true;
     
     private RenderTarget2D RenderTarget;
     
@@ -53,7 +53,7 @@ public class RenderWindow
         if (!Visible)
             return;
         
-        ImGui.Begin(Title, ref Visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.DockNodeHost | ImGuiWindowFlags.NoMove);
+        ImGui.Begin(Title, ref Visible, ImGuiWindowFlags.DockNodeHost);
         // Create menu top bar
         
         
@@ -71,11 +71,14 @@ public class RenderWindow
             Size = new Vector2(640, 360);
         else
             Size = ImGui.GetWindowSize();
-        
+
         ImGui.SetNextWindowContentSize(Size);
+        ImGui.BeginChild("Game", Size, true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
         var renderPtr = imGuiRenderer.BindTexture(RenderTarget); 
-        ImGui.Image(renderPtr, Size);
+        ImGui.Image(renderPtr, Size, Vector2.Zero, Vector2.One);
+        ImGui.EndChild();
         ImGui.End();
+        
     }
     
 }

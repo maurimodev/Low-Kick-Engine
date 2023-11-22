@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Coroutine;
 using ImGuiNET;
+using KungFuPlatform.Editor.Windows;
 using Microsoft.Xna.Framework;
 public class PlayerController : Component
 {
@@ -90,6 +91,7 @@ public class PlayerController : Component
             {
                 if (coyoteTimer > 0 & !usedUpCoyote)
                 {
+                    LKConsole.Log("Coyote Jump!");
                     CoroutineHandler.Start(Jump(gameTime));
                     usedUpCoyote = true;
                 }
