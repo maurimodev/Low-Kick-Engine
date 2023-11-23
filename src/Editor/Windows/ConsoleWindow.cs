@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Coroutine;
 using ImGuiNET;
@@ -74,11 +75,7 @@ public static class LKConsole
     }
     public static void Log(string message, LogType type = LogType.Info)
     {
-        log.Add(new LogMessage()
-        {
-            Message = message,
-            Type = type,
-        });
+        log.Add(new LogMessage(message, type));
 
         if (log.Count > 100)
         {
@@ -96,10 +93,18 @@ public struct LogMessage
 {
     public string Message;
     public LogType Type;
+    private TimeSpan LogTime;
+    
+    public LogMessage(string message, LogType type = LogType.Info)
+    {
+        Message = message;
+        Type = type;
+        LogTime = TimeSpan.FromSeconds(Time.unscaledTime);
+    }
     
     public override string ToString()
     {
-        return $"[{Type.ToString()}] {Message}";
+        return $"[{Type.ToString()}] [{LogTime.ToString(@"hh\:mm\:ss")}] - {Message}";
     }
     
     public static implicit operator string(LogMessage message)

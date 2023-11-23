@@ -10,7 +10,7 @@ namespace KungFuPlatform.Editor.Windows;
 
 public class TextureViewerWindow : Window
 {
-    private List<Texture2D> textureFiles;
+    private List<Texture2D> textureFiles = new List<Texture2D>();
     private int selectedTexture = 0;
     private GraphicsDeviceManager Graphics;
     
@@ -22,8 +22,8 @@ public class TextureViewerWindow : Window
     public void LoadTextures()
     {
         textureFiles = new List<Texture2D>();
-        
-        var files = Directory.GetFiles("Content");
+
+        var files = Directory.GetFiles("Content/Textures");
         
         // Create a file stream and read each file in files
 
@@ -34,6 +34,7 @@ public class TextureViewerWindow : Window
                 var texture = Texture2D.FromStream(Graphics.GraphicsDevice, fileStream);
                 texture.Name = Path.GetFileNameWithoutExtension(file);
                 textureFiles.Add(texture);
+                fileStream.Dispose();
             }
         }
     }
@@ -53,10 +54,13 @@ public class TextureViewerWindow : Window
     }
     public override void Layout(ImGuiRenderer renderer)
     {
-        LoadTextures();
-        
-        if(textureFiles.Count > 0)
+        if(ImGui.Button("Load Textures"))
+            LoadTextures();
+
+        if (textureFiles.Count > 0)
             ImGui.ListBox("Textures", ref selectedTexture, GetTextureNames().ToArray(), textureFiles.Count);
+        else
+            return;
 
         var tex = renderer.BindTexture(textureFiles[selectedTexture]);
         ImGui.Image(tex, new Vector2(textureFiles[selectedTexture].Width, textureFiles[selectedTexture].Height), Vector2.Zero, Vector2.One);

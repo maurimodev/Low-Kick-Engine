@@ -7,13 +7,7 @@ public class Transform : Component
     public int layerDepth = 0;
     public float rotation = 0;
 
-    public Transform(Entity entity)
-    {
-        this.entity = entity;
-        TransformSystem.Register(this);
-    }
-
-    public void ImGuiLayout()
+    public override void ImGuiLayout()
     {
         var numPos = position.TranslateVector2();
         var numScale = scale.TranslateVector2();

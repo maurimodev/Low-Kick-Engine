@@ -93,6 +93,7 @@
     <Compile Include="src\ECS\Components\Camera2D.cs" />
     <Compile Include="src\ECS\Components\Collider.cs" />
     <Compile Include="src\ECS\Components\PlayerController.cs" />
+    <Compile Include="src\ECS\Components\Tween.cs" />
     <Compile Include="src\ECS\Systems\AnimationSystem.cs" />
     <Compile Include="src\ECS\Systems\BaseSystem.cs" />
     <Compile Include="src\ECS\Systems\DrawQueue.cs" />
@@ -100,10 +101,12 @@
     <Compile Include="src\ECS\Components\Sprite.cs" />
     <Compile Include="src\ECS\Entity.cs" />
     <Compile Include="src\ECS\Components\Transform.cs" />
+    <Compile Include="src\ECS\Systems\EntityManager.cs" />
     <Compile Include="src\ECS\Systems\PhysicsSystem.cs" />
-    <Compile Include="src\Editor\RenderWindow.cs" />
+    <Compile Include="src\Editor\Editor.cs" />
     <Compile Include="src\Editor\Window.cs" />
     <Compile Include="src\Editor\Windows\ConsoleWindow.cs" />
+    <Compile Include="src\Editor\Windows\RenderWindow.cs" />
     <Compile Include="src\Editor\Windows\TextureViewerWindow.cs" />
     <Compile Include="src\Graphics\Animation.cs" />
     <Compile Include="src\Graphics\TextureSheet.cs" />
@@ -113,6 +116,7 @@
     <Compile Include="src\Physics2D.cs" />
     <Compile Include="src\ECS\Systems\TransformSystem.cs" />
     <Compile Include="src\Time.cs" />
+    <Compile Include="src\Utilities\Ease.cs" />
     <Compile Include="src\Utilities\Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>

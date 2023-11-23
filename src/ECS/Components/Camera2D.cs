@@ -4,6 +4,7 @@ using System.Collections;
 using Coroutine;
 using System.Collections.Generic;
 using System;
+using KungFuPlatform.Editor.Windows;
 
 public class Camera2D : Component
 {
@@ -27,11 +28,6 @@ public class Camera2D : Component
         }
     }
 
-    public void Move(Vector2 dir)
-    {
-        entity.transform.position += dir;
-    }
-
     public void AttachToEntity(Entity entity)
     {
         if (entity == null)
@@ -40,11 +36,11 @@ public class Camera2D : Component
             attachedEntity = null;
             return;
         }
-        CoroutineHandler.Start(LerpBetweenPositions(this.entity.transform, entity.transform, 4));
+        CoroutineHandler.Start(LerpBetweenPositions(this.entity.transform, entity.transform, 1));
         isAttached = true;
         attachedEntity = entity;
     }
-    public override void Update(GameTime gameTime)
+    public override void Update()
     {
         if (isAttached && !isLerping)
         {
@@ -52,19 +48,16 @@ public class Camera2D : Component
         }
     }
 
-    public IEnumerator<Wait> LerpBetweenPositions(Transform current, Transform goal, float speed)
+    public IEnumerator<Wait> LerpBetweenPositions(Transform current, Transform goal, float duration, EaseType ease = EaseType.OutCirc)
     {
         isLerping = true;
-        float t = 0;
-        while(t < 1)
-        {
-            System.Numerics.Vector2 lerpPos = System.Numerics.Vector2.Lerp(current.position.TranslateVector2(), goal.position.TranslateVector2(), t);
-            entity.transform.position = lerpPos.TranslateVector2();
-            t += speed * Time.deltaTime;
-            yield return new Wait(Time.deltaTime);
-        }
+        var tween = Tween.Position(entity, goal.position, duration, ease);
+        Event endEvent = new Event();
+        tween.OnComplete = _ => CoroutineHandler.RaiseEvent(endEvent);
+        LKConsole.Log("Started lerping");
+        yield return new Wait(endEvent);
         isLerping = false;
-        Console.WriteLine("Finished routine!");
+        LKConsole.Log("Done lerping");
 
     }
     public Matrix GetTransformation(GraphicsDevice device)
@@ -77,7 +70,7 @@ public class Camera2D : Component
         return matrixTransform;
     }
 
-    public void ImGuiLayout()
+    public override void ImGuiLayout()
     {
         ImGuiNET.ImGui.DragFloat("Zoom", ref zoom);
     }

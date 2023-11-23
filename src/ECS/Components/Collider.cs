@@ -30,7 +30,7 @@ public class Collider : Component
         DrawQueue.RegisterForDebugDraw(this);
     }
 
-    public override void Update(GameTime gameTime)
+    public override void Update()
     {
         bounds.X = entity.transform.position.X + offset.X;
         bounds.Y = entity.transform.position.Y + offset.Y;
@@ -94,10 +94,8 @@ public class Collider : Component
         return false;
     }
 
-    public void ImGuiLayout()
+    public override void ImGuiLayout()
     {
-        var rect = new RectangleF(entity.transform.position.X + offset.X, entity.transform.position.Y + offset.Y, bounds.Width * scale.X * entity.transform.scale.X, bounds.Height * scale.Y * entity.transform.scale.Y);
-        ImGui.LabelText("", rect.ToString());
         var numOffset = offset.TranslateVector2();
         var numScale = scale.TranslateVector2();
         ImGuiNET.ImGui.DragFloat2("Collider Offset", ref numOffset, 0.1f);

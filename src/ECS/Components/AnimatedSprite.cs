@@ -35,7 +35,7 @@ public class AnimatedSprite : Component
         base.Start();
     }
 
-    public override void Update(GameTime gameTime)
+    public override void Update()
     {
         activeAnimation.Update(Time.deltaTime);
     }

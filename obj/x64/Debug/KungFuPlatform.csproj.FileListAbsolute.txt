@@ -39,3 +39,4 @@ C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\C
 C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\System.ValueTuple.dll
 C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\Coroutine.xml
 C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\bin\x64\Debug\System.ValueTuple.xml
+C:\Users\mauri\Documents\Projects\KungFuPlatforms\KungFuPlatform\obj\x64\Debug\KungFuPlatform.csproj.SuggestedBindingRedirects.cache

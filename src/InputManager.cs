@@ -93,7 +93,7 @@ public static class InputManager
         keybinds.Add(control, bind);
     }
 
-    public static void Update(GameTime time)
+    public static void Update()
     {
         previousKeyState = currentKeyState;
         currentGamePadState = previousGamePadState;

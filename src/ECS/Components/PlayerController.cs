@@ -51,7 +51,7 @@ public class PlayerController : Component
         transform = entity.transform;
         collider = entity.GetComponent<Collider>();
     }
-    public override void Update(GameTime gameTime)
+    public override void Update()
     {
         var axis = InputManager.GetAxis(Axis.LEFT_STICK);
 
@@ -86,13 +86,13 @@ public class PlayerController : Component
         if(InputManager.GetInputDown(ControlScheme.A))
         {
             if(isGrounded && !isJumping)
-                CoroutineHandler.Start(Jump(gameTime));
+                CoroutineHandler.Start(Jump());
             else
             {
                 if (coyoteTimer > 0 & !usedUpCoyote)
                 {
                     LKConsole.Log("Coyote Jump!");
-                    CoroutineHandler.Start(Jump(gameTime));
+                    CoroutineHandler.Start(Jump());
                     usedUpCoyote = true;
                 }
             }
@@ -189,7 +189,7 @@ public class PlayerController : Component
         }
     }
 
-    public IEnumerator<Wait> Jump(GameTime gameTime)
+    public IEnumerator<Wait> Jump()
     {
         usedUpCoyote = true;
         isJumping = true;
@@ -259,14 +259,13 @@ public class PlayerController : Component
         return false;
     }
 
-    public void ImGuiLayout()
+    public override void ImGuiLayout()
     {
         ImGui.BeginGroup();
-        ImGui.LabelText("Collider Rect: ", collider.bounds.ToString());
         ImGui.DragFloat("Player Speed", ref speed);
         ImGui.DragFloat("Acceleration Scale", ref accelerationScale);
         ImGui.LabelText("Current Acceleration:", currentAccel.ToString());
-        ImGui.BeginTabBar("Tab");
+        ImGui.LabelText("Current Fall Acceleration:", currentFallAccel.ToString());
         var jumpMenuOn = ImGui.BeginMenu("Jump Properties");
         if (jumpMenuOn)
         {
@@ -282,7 +281,6 @@ public class PlayerController : Component
             ImGui.LabelText("Is Jumping: ", isJumping.ToString());
         }
         ImGui.EndMenu();
-        ImGui.EndTabBar();
     }
     // ON COLLIDE
     public void OnFallCollide(Collider collideWith)

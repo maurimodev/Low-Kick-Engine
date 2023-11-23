@@ -5,12 +5,12 @@ using KungFuPlatform.Scripts.Math;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-public class DrawQueue
+public static class DrawQueue
 {
     public static bool DrawDebug = false;
-    protected static List<Sprite> sprites = new List<Sprite>();
-    protected static List<AnimatedSprite> animatedSprites = new();
-    protected static List<Collider> colliders = new List<Collider>();
+    private static List<Sprite> sprites = new();
+    private static List<AnimatedSprite> animatedSprites = new();
+    private static List<Collider> colliders = new();
 
     public static void RegisterForDraw(Sprite sprite)
     {
@@ -36,13 +36,14 @@ public class DrawQueue
         colliders.Remove(collider);
     }
 
-    public void DrawAllInQueue(SpriteBatch batch)
+    public static void DrawAllInQueue(SpriteBatch batch, Camera2D camera, GraphicsDevice graphicsDevice)
     {
         //for (int i = 0; i < sprites.Count; i++)
         //{
         //    batch.Draw(sprites[i].texture, sprites[i].entity.transform.position, Color.White);
         //}
-
+        batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+            DepthStencilState.DepthRead, RasterizerState.CullNone, null, camera.GetTransformation(graphicsDevice));
         foreach (var sprite in sprites)
         {
             batch.Draw(sprite.texture, sprite.entity.transform.position, 
@@ -99,9 +100,10 @@ public class DrawQueue
                     Color.Green);
             }
         }
+        batch.End();
     }
 
-    public void DisposeAll()
+    public static void DisposeAll()
     {
         for (int i = 0; i < sprites.Count; i++)
         {
